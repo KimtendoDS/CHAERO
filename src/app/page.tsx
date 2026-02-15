@@ -573,7 +573,7 @@ function HomeContent() {
                   </motion.div>
                   
                   <motion.div 
-                    key={startDate.getTime() + endDate.getTime()}
+                    key={(startDate?.getTime() ?? 0) + (endDate?.getTime() ?? 0)}
                     initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }}
                     style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontWeight: '600', letterSpacing: '-0.5px' }}
                   >          
@@ -586,7 +586,8 @@ function HomeContent() {
                     <span style={{ fontSize: '13px', fontWeight: '900', color: '#130C1A' }}>
                       {(() => {
                         const heart = <span style={{ color: '#FF4D4D', marginRight: '4px' }}>❤️</span>;
-                        const diff = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                        
+                        const diff = Math.floor(((endDate?.getTime() ?? 0) + (startDate?.getTime() ?? 0)) / (1000 * 60 * 60 * 24));
                         return (
                           <div style={{ display: 'flex', alignItems: 'center' }}>
                             {heart}
@@ -602,7 +603,7 @@ function HomeContent() {
                 <div onClick={() => { setSelectingType("end"); setIsDateSheetOpen(true); }} style={{ position: 'relative', zIndex: 1, padding: '24px', paddingLeft: '64px', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: selectingType === "end" && isDateSheetOpen ? '1px solid #C084FC' : '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', transition: '0.3s' }}>
                   <div style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', borderRadius: '4px', background: '#C084FC', boxShadow: '0 0 10px rgba(192, 132, 252, 0.5)' }} />
                   <div style={{ fontSize: '11px', color: '#C084FC', fontWeight: '900', letterSpacing: '1px' }}>TO</div>
-                  <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px' }}>{endDate.getMonth() + 1}월 {endDate.getDate()}일</div>
+                  <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px' }}>{(endDate?.getMonth() ?? 0) + 1}월 {endDate?.getDate() ?? 0}일</div>
                 </div>
               </div>
 
