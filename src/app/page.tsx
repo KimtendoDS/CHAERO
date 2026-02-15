@@ -1536,7 +1536,7 @@ function HomeContent() {
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   <label style={{ fontSize: '11px', color: '#C084FC', fontWeight: '900', letterSpacing: '0.05em' }}>총 예산</label>
-                  {totalBudget > 0 && (
+                  {Number(totalBudget) > 0 && (
                     <span style={{ fontSize: '13px', fontWeight: '700', color: '#5EEAD4' }}>
                       ≈ {currentCurrency.unit} {(Number(totalBudget) * currentCurrency.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </span>
@@ -1675,7 +1675,7 @@ function HomeContent() {
                 <div style={{ marginBottom: '20px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <label style={{ fontSize: '11px', color: '#C084FC', fontWeight: '900', letterSpacing: '0.05em' }}>TOTAL BUDGET</label>
-                    {totalBudget > 0 && (
+                    {Number(totalBudget) > 0 && (
                       <span style={{ fontSize: '13px', fontWeight: '700', color: '#F472B6' }}>
                         ≈ {currentCurrency.unit} {(Number(totalBudget) * currentCurrency.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                       </span>
