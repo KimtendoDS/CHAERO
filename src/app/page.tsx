@@ -16,7 +16,7 @@ declare global {
 
 function HomeContent() {
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState(0); 
+  const [step, setStep] = useState(6); 
   const [address, setAddress] = useState("");
   const [lang, setLang] = useState("KR"); 
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -1324,7 +1324,7 @@ function HomeContent() {
                   transition={{ repeat: Infinity, duration: 2 }}
                   style={{
                     position: 'absolute',
-                    top: '-125px',
+                    top: '-155px',
                     left: '35px',
                     fontSize: '116px',
                     filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'

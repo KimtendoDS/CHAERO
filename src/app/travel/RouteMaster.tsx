@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
   ChevronLeft, ChevronRight, ChefHat, BookOpen,
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react';
 
 const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(1);
   const [showAllWeeks, setShowAllWeeks] = useState(false);
@@ -90,12 +92,12 @@ const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
         .flowing-dash { animation: flowDown 1.5s linear infinite; }
       `}</style>
 
-      {/* [1] 메인 영역 */}
-      <div className="no-scrollbar" style={{ flex: 1, background: '#020306', height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingBottom: '180px', boxSizing: 'border-box', filter: showAllWeeks ? 'brightness(0.5) blur(4px)' : 'none', transition: 'all 0.5s ease' }}>
+      {/* [1] 메인 영역 - paddingBottom 제거 */}
+      <div className="no-scrollbar" style={{ flex: 1, background: '#020306', height: '100vh', display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingBottom: '20px', boxSizing: 'border-box', filter: showAllWeeks ? 'brightness(0.5) blur(4px)' : 'none', transition: 'all 0.5s ease' }}>
         
         {/* 헤더 */}
         <div style={{ padding: '20px 20px 0 20px' }}>
-          <button onClick={() => setStep?.(0)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}><ChevronLeft size={24} /></button>
+          <button onClick={() => router.push('/?step=6')} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}><ChevronLeft size={24} /></button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}><ChefHat size={16} color="#5EEAD4" /><span style={{ fontSize: '11px', color: '#5EEAD4', fontWeight: '800', letterSpacing: '1px' }}>CHEF CHAERO'S MASTERPIECE</span></div>
           <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#fff', lineHeight: '1.4', letterSpacing: '-0.8px', margin: 0 }}>당신을 위해 만든 <span style={{ background: najeonGrad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'inline-block' }}>맛있는 여행 레시피</span></h1>
           <div style={{ marginTop: '9px' }}><p style={{ color: '#94A3B8', fontSize: '14px', margin: 0, fontWeight: '500' }}>2026.01.01 ~ 2026.03.30</p></div>
@@ -137,7 +139,7 @@ const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
           </div>
         </div>
 
-        {/* TOP 3 리스트 - 번개 아이콘(Zap) 및 화살표 복구 */}
+        {/* TOP 3 리스트 */}
         <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ fontSize: '15px', fontWeight: '800', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}><BookOpen size={16} color="#C084FC" /> 시작 추천 코스</div>
           {allWeeks.slice(0, 3).map((bundle) => {
@@ -184,29 +186,19 @@ const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
                     )}
                   </AnimatePresence>
                 </div>
-                {/* [화살표 복구] 카드 하단 화살표 */}
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0', background: 'rgba(255,255,255,0.03)' }}><ChevronsDown size={14} color="rgba(255,255,255,0.15)" /></div>
               </motion.div>
             );
           })}
           <motion.button whileTap={{ scale: 0.98 }} onClick={() => setShowAllWeeks(true)} style={{ width: '100%', padding: '20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', color: '#fff', fontWeight: '900', fontSize: '18px', marginTop: '8px', cursor: 'pointer' }}>전체 일정 보기</motion.button>
         </div>
-      </div>
 
-      {/* [수정-RED] [2] 하단 플로팅 버튼 - 다음 단계 이동 버튼 글로우 고도화 */}
-      <AnimatePresence>
+        {/* 하단 버튼 - 스크롤 컨텐츠 안에 위치 */}
         {!showAllWeeks && (
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }}
-            style={{ 
-              position: 'fixed', bottom: '0', left: '0', right: '0', 
-              padding: '20px 20px 40px 20px', zIndex: 100, pointerEvents: 'none', 
-              background: 'linear-gradient(to top, black 60%, transparent)' // 배경 가림 방지
-            }}
-          >
+          <div style={{ padding: '20px 20px 40px 20px', background: 'linear-gradient(to top, #020306 80%, transparent)' }}>
             <motion.button 
               whileTap={{ scale: 0.96 }} 
-              onClick={() => setStep?.(2)} // RouteDetail로 이동
+              onClick={() => setStep?.(2)}
               style={{ 
                 width: '100%', 
                 background: najeonGrad, 
@@ -216,30 +208,20 @@ const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
                 color: '#000', 
                 fontWeight: '950', 
                 fontSize: '18px', 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                gap: '10px', 
-                // ✅ 나전칠기 시그니처 글로우 효과
                 boxShadow: '0 0 20px rgba(94, 234, 212, 0.5), 0 0 40px rgba(192, 132, 252, 0.3)',
-                pointerEvents: 'auto',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                cursor: 'pointer'
               }}
             >
-              {/* 자개 표면의 광택을 표현한 내부 레이어 */}
-              <div style={{
-                position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%',
-                background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
-                opacity: 0.3, pointerEvents: 'none'
-              }} />
+              <div style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)', opacity: 0.3, pointerEvents: 'none' }} />
               상세 일정 만들기              
             </motion.button>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
 
-      {/* [3] 바텀시트 - [이모티콘 복구] 점선 위 이동수단 아이콘 */}
+      {/* [3] 바텀시트 */}
       <AnimatePresence>
         {showAllWeeks && (
           <>
@@ -262,7 +244,6 @@ const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
                         {index < allWeeks.length - 1 && (
                           <div style={{ flex: 1, width: '2px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '4px 0' }}>
                             <div className="flowing-dash" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundImage: `linear-gradient(to bottom, ${style.color} 50%, transparent 50%)`, backgroundSize: '2px 14px', opacity: 0.2, zIndex: 1 }} />
-                            {/* [이모티콘 복구] 점선 사이의 수단 아이콘 */}
                             {index % 2 === 0 && (<div style={{ position: 'relative', zIndex: 3, background: '#05070A', padding: '10px 0', color: style.color, opacity: 0.8 }}><RandomIcon size={22} strokeWidth={2.5} /></div>)}
                           </div>
                         )}
@@ -273,7 +254,6 @@ const RouteMaster = ({ setStep }: { setStep: (s: number) => void }) => {
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                               <span style={{ fontSize: '16px', color: style.color, fontWeight: '900' }}>{week.koLabel}</span>
                               <h3 style={{ fontSize: '18px', fontWeight: '900', color: '#fff', margin: '4px 0' }}>{week.title}</h3>
-                              {/* [지표 복구] 바텀시트 메트릭 3종 */}
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={10} color={pointColor}/><span style={{ fontSize: '10px', color: pointColor, fontWeight: '800' }}>{week.metrics.schedule}</span></div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Map size={10} color={pointColor}/><span style={{ fontSize: '10px', color: pointColor, fontWeight: '800' }}>{week.metrics.dist}</span></div>
