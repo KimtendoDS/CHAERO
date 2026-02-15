@@ -23,6 +23,9 @@ function HomeContent() {
   const [isError, setIsError] = useState(false);  
   const [suggestions, setSuggestions] = useState<any[]>([]); 
 
+  // 1. 상태에 캐시 추가 (HomeContent 함수 최상단)
+  const [searchCache, setSearchCache] = useState<Map<string, any[]>>(new Map());
+
   // 컴포넌트가 브라우저에 마운트(실행)되었는지 확인
   useEffect(() => {setMounted(true);}, []);
   const [activeIndex, setActiveIndex] = useState(3); // 8개 중 중간인 3~4번을 기본값으로  
@@ -60,37 +63,53 @@ function HomeContent() {
   // 1. 주소 선택 중인지 확인하는 상태
   const [isSelecting, setIsSelecting] = useState(false); 
 
-// 1. 주소 검색 및 자동완성 통합 로직 (46번 라인 근처부터 시작되는 중복 useEffect들을 이걸로 교체)
-  useEffect(() => {
-    if (isSelecting) return;
+// useEffect 안에서 로딩 상태 관리
+useEffect(() => {
+  if (isSelecting) return;
 
-    if (!address.trim()) {
-      setSuggestions([]);
-      return;
-    }
+  if (!address.trim()) {
+    setSuggestions([]);
+    setIsSearching(false);
+    return;
+  }
 
-    const debounceTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(address)}`);
-        // ✅ 여기서 data를 정의합니다.
-        const data = await res.json(); 
+  // 캐시 확인
+  if (searchCache.has(address)) {
+    setSuggestions(searchCache.get(address)!);
+    setIsSearching(false);
+    return;
+  }
 
-        if (data && data.documents) {
-          const filtered = data.documents.map((item: any) => ({
-            title: item.place_name,
-            address: item.road_address_name || item.address_name,
-            x: item.x, // 경도
-            y: item.y  // 위도
-          })).slice(0, 5);
-          setSuggestions(filtered);
-        }
-      } catch (err) {
-        console.error("카카오 API 호출 에러:", err);
+  setIsSearching(true); // ✅ 로딩 시작
+
+  const debounceTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(address)}`);
+      const data = await res.json(); 
+
+      if (data && data.documents) {
+        const filtered = data.documents.map((item: any) => ({
+          title: item.place_name,
+          address: item.road_address_name || item.address_name,
+          x: item.x,
+          y: item.y
+        })).slice(0, 5);
+        
+        setSuggestions(filtered);
+        setSearchCache(prev => new Map(prev).set(address, filtered));
       }
-    }, 300);
-
+    } catch (err) {
+      console.error("카카오 API 호출 에러:", err);
+    } finally {
+      setIsSearching(false); // ✅ 로딩 종료
+    }
+  }, 100);
     return () => clearTimeout(debounceTimer);
-  }, [address, isSelecting]);
+  }, [address, isSelecting, searchCache]);
+
+  // 3. 추가 최적화: 로딩 인디케이터 추가
+  const [isSearching, setIsSearching] = useState(false);
+
   // 카카오 주소
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
@@ -392,7 +411,19 @@ function HomeContent() {
                           setAddress(e.target.value); 
                         }} 
                         style={{ flex: 1, background: 'transparent', border: 'none', color: '#1F2937', fontSize: '17px', outline: 'none', fontWeight: '800' }} 
-                      />                      
+                      />
+                      
+                      {/* ✅ 로딩 인디케이터 추가 */}
+                      {isSearching && (
+                        <div style={{ 
+                          width: '20px', 
+                          height: '20px', 
+                          border: '2px solid rgba(94, 234, 212, 0.3)', 
+                          borderTop: '2px solid #5EEAD4', 
+                          borderRadius: '50%', 
+                          animation: 'spin 0.6s linear infinite' 
+                        }} />
+                      )}
                     </div>
                   </div>
 
@@ -446,21 +477,53 @@ function HomeContent() {
                   )}
                 </div>
 
-                {/* 4. 버튼 영역 */}
-                <div style={{ 
-                  marginTop: '18px', 
-                  background: address.trim() ? auroraPearlBorder : 'rgba(255,255,255,0.05)', 
-                  padding: '1.5px', borderRadius: '20px', 
-                  boxShadow: address.trim() ? '0 0 20px rgba(94, 234, 212, 0.3), 0 0 40px rgba(192, 132, 252, 0.15)' : 'none'
-                }}>
-                  <button 
-                    disabled={!address.trim()} 
-                    onClick={handleConfirmLocation} 
-                    style={{ width: '100%', padding: '18px', borderRadius: '19px', background: address.trim() ? najeonGrad : 'rgba(255,255,255,0.05)', color: address.trim() ? '#1F2937' : 'rgba(255,255,255,0.2)', fontWeight: '900', border: 'none', cursor: address.trim() ? 'pointer' : 'default', fontSize: '17px' }}
-                  >
-                    {lang === "KR" ? "위치 확인하기" : "Confirm Location"}
-                  </button>
-                </div>
+                {/* 4. 버튼 영역 - 글로우만 추가 */}
+<div style={{ 
+  marginTop: '18px', 
+  background: address.trim() ? auroraPearlBorder : 'rgba(255,255,255,0.05)', 
+  padding: '1.5px', 
+  borderRadius: '20px', 
+  // ✅ 글로우만 더 강하게
+  boxShadow: address.trim() 
+    ? '0 0 20px rgba(94, 234, 212, 0.5), 0 0 40px rgba(192, 132, 252, 0.3)' 
+    : 'none'
+}}>
+  <button 
+    disabled={!address.trim()} 
+    onClick={handleConfirmLocation} 
+    style={{ 
+      width: '100%', 
+      padding: '18px', 
+      borderRadius: '19px', 
+      background: address.trim() ? najeonGrad : 'rgba(255,255,255,0.05)', // ✅ 원래대로
+      color: address.trim() ? '#1F2937' : 'rgba(255,255,255,0.2)', 
+      fontWeight: '900', 
+      border: 'none', 
+      cursor: address.trim() ? 'pointer' : 'default', 
+      fontSize: '17px',
+      position: 'relative',
+      overflow: 'hidden'
+    }}
+  >
+    {/* ✅ 자개 광택만 살짝 */}
+    {address.trim() && (
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        left: '-50%',
+        width: '200%',
+        height: '200%',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
+        opacity: 0.3,
+        pointerEvents: 'none'
+      }} />
+    )}
+    
+    <span style={{ position: 'relative', zIndex: 1 }}>
+      {lang === "KR" ? "위치 확인하기" : "Confirm Location"}
+    </span>
+  </button>
+</div>
               </div>
               <div style={{ flex: 1 }} />
             </motion.div>
@@ -468,42 +531,48 @@ function HomeContent() {
                     
           {/* Step 2: 지도 확인 */}
           {step === 2 && (
-            <motion.div key="step2" initial={{ x: 300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -300, opacity: 0 }} transition={{ type: "spring", damping: 25, stiffness: 200 }} style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column' }}>
+            <motion.div 
+              key="step2" 
+              initial={{ x: 300, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }} 
+              exit={{ x: -300, opacity: 0 }} 
+              transition={{ type: "spring", damping: 25, stiffness: 200 }} 
+              style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column' }}
+            >
               <div ref={mapElement} style={{ position: 'absolute', inset: 0, backgroundColor: '#0F1115' }} />
               
+              {/* 뒤로가기 */}
               <div style={{ position: 'absolute', top: 0, width: '100%', height: '80px', background: 'linear-gradient(to bottom, rgba(10,10,10,0.8) 0%, transparent 100%)', padding: '30px 20px', boxSizing: 'border-box', zIndex: 10 }}>
                 <button onClick={() => setStep(1)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }}>
                   <ChevronLeft size={24} />
                 </button>
               </div>
 
-              <motion.div initial={{ y: 100 }} animate={{ y: 0 }} transition={{ delay: 0.3, type: "spring", damping: 20 }} style={{ marginTop: 'auto', padding: '20px', zIndex: 10 }}>
-                {/* 하단 카드: 나전칠기 컨셉의 어두운 배경으로 변경 */}
+              {/* ✅ 하단 카드 - 애니메이션 제거하고 화면과 함께 등장 */}
+              <div style={{ marginTop: 'auto', padding: '20px', zIndex: 10 }}>
                 <div style={{ 
-                  background: '#12141C', // 어두운 배경색
+                  background: '#12141C',
                   borderRadius: '30px', 
                   padding: '28px', 
                   boxShadow: '0 -20px 40px rgba(0,0,0,0.5)', 
-                  border: '1px solid rgba(255,255,255,0.1)' // 은은한 테두리
+                  border: '1px solid rgba(255,255,255,0.1)'
                 }}>
                   <div style={{ marginBottom: '22px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                       <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: najeonGrad }} />
-                      {/* 다국어 처리 적용 */}
                       <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', fontWeight: '800', letterSpacing: '0.1em' }}>
                         {lang === "KR" ? "위치 확인" : "CONFIRM LOCATION"}
                       </span>
                     </div>
-                    {/* 주소 텍스트 색상을 밝게 변경 */}
                     <h3 style={{ fontSize: '20px', fontWeight: '900', color: '#FFFFFF', lineHeight: '1.4' }}>{address}</h3>
                   </div>
 
-                  {/* 버튼: 다른 Step의 발광 스타일과 통일 */}
+                  {/* ✅ 버튼 - 원래 색 + 글로우만 추가 */}
                   <div style={{ 
-                    background: auroraPearlBorder, // 오로라 테두리
+                    background: najeonGrad, // ✅ 원래대로 그라데이션 테두리
                     padding: '1.5px', 
                     borderRadius: '20px', 
-                    boxShadow: '0 0 20px rgba(94, 234, 212, 0.3), 0 0 40px rgba(192, 132, 252, 0.15)' // 발광 효과
+                    boxShadow: '0 0 20px rgba(94, 234, 212, 0.5), 0 0 40px rgba(192, 132, 252, 0.3)' // ✅ 글로우만 추가
                   }}>
                     <button 
                       onClick={() => setStep(3)} 
@@ -511,20 +580,35 @@ function HomeContent() {
                         width: '100%', 
                         padding: '18px', 
                         borderRadius: '19px', 
-                        background: najeonGrad, 
-                        color: '#1F2937', // 다른 스텝과 동일하게 진한 회색 글자색
+                        background: najeonGrad, // ✅ 원래대로 그라데이션
+                        color: '#1F2937', // ✅ 원래대로 진한 회색
                         fontWeight: '900', 
                         border: 'none', 
                         cursor: 'pointer', 
                         fontSize: '17px',
-                        transition: 'all 0.3s ease'
+                        position: 'relative',
+                        overflow: 'hidden'
                       }}
                     >
-                      {lang === "KR" ? "이 위치가 맞습니다" : "Confirm Location"}
+                      {/* 광택 효과 */}
+                      <div style={{
+                        position: 'absolute',
+                        top: '-50%',
+                        left: '-50%',
+                        width: '200%',
+                        height: '200%',
+                        background: 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)',
+                        opacity: 0.3,
+                        pointerEvents: 'none'
+                      }} />
+                      
+                      <span style={{ position: 'relative', zIndex: 1 }}>
+                        {lang === "KR" ? "이 위치가 맞습니다" : "Confirm Location"}
+                      </span>
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           )}
 
@@ -1324,7 +1408,7 @@ function HomeContent() {
                   transition={{ repeat: Infinity, duration: 2 }}
                   style={{
                     position: 'absolute',
-                    top: '-155px',
+                    top: '-135px',
                     left: '35px',
                     fontSize: '116px',
                     filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
@@ -1794,6 +1878,9 @@ function HomeContent() {
         .wheel-item { height: 44px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; color: rgba(255,255,255,0.15); font-size: 15px; transition: 0.2s; }
         .active-month { color: #5EEAD4 !important; font-size: 19px !important; font-weight: 900 !important; }
         .active-day { color: #C084FC !important; font-size: 19px !important; font-weight: 900 !important; }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   );
