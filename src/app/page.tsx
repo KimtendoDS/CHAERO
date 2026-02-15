@@ -119,10 +119,12 @@ function HomeContent() {
   }, [step]);
 
   useEffect(() => {
+  // @ts-ignore
   const { naver } = window as any;
   if (!mapElement.current || !window.naver) return;
 
-  // 지도 생성
+  // 지도 생성 코드 앞에도 혹시 모르니 붙여주면 좋습니다.
+  // @ts-ignore
   const newMap = new window.naver.maps.Map(mapElement.current, {
     center: new window.naver.maps.LatLng(37.3595704, 127.105399),
     zoom: 15,
