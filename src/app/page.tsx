@@ -423,9 +423,7 @@ function HomeContent() {
                                 const newPos = new naver.maps.LatLng(item.y, item.x);
                                 map.setCenter(newPos);
                                 map.setZoom(17);
-                              }
-                              map.setCenter(newPos); // 이제 에러 안 남!
-                              map.setZoom(17);
+                              }                      
                             } else {
                               // 만약 Step 1이라 지도가 아직 없다면, 콘솔에만 찍고 넘어갑니다.
                               console.log("지도가 아직 로드되지 않았습니다. 좌표만 저장합니다.");
