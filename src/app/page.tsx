@@ -415,7 +415,15 @@ function HomeContent() {
                             //setStep(2);
                             // 📍 수정된 지도 이동 로직
                             if (map && map.setCenter && item.x && item.y) {
-                              const newPos = new window.naver.maps.LatLng(item.y, item.x);
+                              // @ts-ignore
+                              const { naver } = window as any; // window를 any로 세탁해서 naver를 꺼냄
+                              // @ts-ignore
+                              if (naver && naver.maps) {
+                                // @ts-ignore
+                                const newPos = new naver.maps.LatLng(item.y, item.x);
+                                map.setCenter(newPos);
+                                map.setZoom(17);
+                              }
                               map.setCenter(newPos); // 이제 에러 안 남!
                               map.setZoom(17);
                             } else {
