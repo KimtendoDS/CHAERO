@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Plane, Home as HomeIcon, Trees, Building2, UtensilsCrossed, Camera, Palette, ShoppingBag, Coffee, RotateCcw, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-datepicker/dist/react-datepicker.css";
-//import RouteDetail from './travel/RouteDetail';
-//import RouteMaster from './travel/RouteMaster';
 
 declare global {
   interface Window {
@@ -121,6 +119,7 @@ function HomeContent() {
   }, [step]);
 
   useEffect(() => {
+  const { naver } = window as any;
   if (!mapElement.current || !window.naver) return;
 
   // 지도 생성
