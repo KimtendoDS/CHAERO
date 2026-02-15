@@ -559,7 +559,7 @@ function HomeContent() {
                 <div onClick={() => { setSelectingType("start"); setIsDateSheetOpen(true); }} style={{ position: 'relative', zIndex: 1, padding: '24px', paddingLeft: '64px', borderRadius: '24px', background: 'rgba(255,255,255,0.03)', border: selectingType === "start" && isDateSheetOpen ? '1px solid #5EEAD4' : '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', transition: '0.3s' }}>
                   <div style={{ position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', borderRadius: '50%', background: '#5EEAD4', boxShadow: '0 0 10px rgba(94, 234, 212, 0.5)' }} />
                   <div style={{ fontSize: '11px', color: '#5EEAD4', fontWeight: '900', letterSpacing: '1px' }}>FROM</div>
-                  <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px' }}>{startDate.getMonth() + 1}월 {startDate.getDate()}일</div>
+                  <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '4px' }}>{(startDate?.getMonth() ?? 0) + 1}월 {startDate?.getDate() ?? 0}일</div>
                 </div>
 
                 {/* ⚡ 중간 비행기 및 실시간 날짜 텍스트 (위치 gap에 맞춰 조정) */}
