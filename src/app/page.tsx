@@ -1635,7 +1635,7 @@ function HomeContent() {
                 style={{ position: 'fixed', inset: 0, zIndex: 100 }}
               >
                 {/* 상세 페이지에서 뒤로가기 하면 마스터(13)로 이동 */}
-                <RouteDetail onBack={() => setStep(13)} />
+                <RouteDetail setStep={() => setStep(13)} />
               </motion.div>
             )}
           </AnimatePresence>
