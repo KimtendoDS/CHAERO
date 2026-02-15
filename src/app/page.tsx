@@ -616,7 +616,7 @@ function HomeContent() {
                     padding: '18px', 
                     borderRadius: '21px', 
                     background: najeonGrad, 
-                    olor: '#130C1A', 
+                    color: '#130C1A', 
                     fontWeight: '900', 
                     fontSize: '17px',
                      boxShadow: '0 10px 20px rgba(0,0,0,0.2)' 
