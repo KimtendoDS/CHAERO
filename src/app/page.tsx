@@ -154,22 +154,28 @@ function HomeContent() {
   useEffect(() => {
     if (isDateSheetOpen) {
       const currentViewDate = selectingType === "start" ? startDate : endDate;
+      
+      // 1. 변수를 미리 선언해둡니다.
+      let m = 0;
+      let d = 0;
+
       if (currentViewDate) {
-        const m = currentViewDate.getMonth() + 1;
-        const d = currentViewDate.getDate();        
+        m = currentViewDate.getMonth() + 1;
+        d = currentViewDate.getDate();
+        
         setTempMonth(m);
         setTempDay(d);
+        
+        // 2. 이제 m과 d를 여기서 사용할 수 있습니다!
+        setTimeout(() => {
+          if (monthRef.current) {
+            monthRef.current.scrollTo({ top: (m - 1) * 44, behavior: 'smooth' });
+          }
+          if (dayRef.current) {
+            dayRef.current.scrollTo({ top: (d - 1) * 44, behavior: 'smooth' });
+          }
+        }, 100);
       }
-
-      // 약간의 지연을 주어 DOM이 렌더링된 후 스크롤 이동
-      setTimeout(() => {
-        if (monthRef.current) {
-          monthRef.current.scrollTo({ top: (m - 1) * 44, behavior: 'smooth' });
-        }
-        if (dayRef.current) {
-          dayRef.current.scrollTo({ top: (d - 1) * 44, behavior: 'smooth' });
-        }
-      }, 100);
     }
   }, [isDateSheetOpen, selectingType]);
 
