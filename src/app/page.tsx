@@ -154,11 +154,12 @@ function HomeContent() {
   useEffect(() => {
     if (isDateSheetOpen) {
       const currentViewDate = selectingType === "start" ? startDate : endDate;
-      const m = currentViewDate.getMonth() + 1;
-      const d = currentViewDate.getDate();
-      
-      setTempMonth(m);
-      setTempDay(d);
+      if (currentViewDate) {
+        const m = currentViewDate.getMonth() + 1;
+        const d = currentViewDate.getDate();        
+        setTempMonth(m);
+        setTempDay(d);
+      }
 
       // 약간의 지연을 주어 DOM이 렌더링된 후 스크롤 이동
       setTimeout(() => {
