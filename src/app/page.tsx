@@ -16,7 +16,7 @@ declare global {
 
 function HomeContent() {
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState(6); 
+  const [step, setStep] = useState(0); 
   const [address, setAddress] = useState("");
   const [lang, setLang] = useState("KR"); 
   const [isLangOpen, setIsLangOpen] = useState(false);
