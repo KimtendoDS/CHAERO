@@ -123,7 +123,7 @@ export default function MapPath({ onBack }: { onBack: () => void }) {
       cursor: 'pointer', 
       display: 'flex', 
       alignItems: 'center', 
-      justify: 'center', 
+      justifyContent: 'center', 
       backdropFilter: 'blur(5px)' 
     }}
   >
