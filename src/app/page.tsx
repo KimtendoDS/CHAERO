@@ -1651,10 +1651,7 @@ function HomeContent() {
                 style={{ position: 'fixed', inset: 0, zIndex: 100, background: '#05060A' }}
               >
                 {/* 마스터 페이지에서 날짜 선택하면 다시 상세(12)로 이동 */}
-                <RouteMaster onDaySelect={(day) => {
-                  // console.log(day + "일 선택됨"); 
-                  setStep(12);
-                }} />
+                <RouteMaster setStep={setStep} />
               </motion.div>
             )}
           </AnimatePresence>
