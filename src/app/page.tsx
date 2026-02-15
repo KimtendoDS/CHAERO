@@ -1556,7 +1556,7 @@ function HomeContent() {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   <label style={{ fontSize: '11px', color: '#5EEAD4', fontWeight: '900', letterSpacing: '0.05em' }}>최대 식사 비용</label>
-                  {mealCost > 0 && (
+                  {Number(mealCost) > 0 && (
                     <span style={{ fontSize: '13px', fontWeight: '700', color: '#C084FC' }}>
                       ≈ {currentCurrency.unit} {(Number(mealCost) * currentCurrency.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </span>
@@ -1690,7 +1690,7 @@ function HomeContent() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <label style={{ fontSize: '11px', color: '#5EEAD4', fontWeight: '900', letterSpacing: '0.05em' }}>MAX MEAL COST</label>
-                    {mealCost > 0 && (
+                    {Number(mealCost) > 0 && (
                       <span style={{ fontSize: '13px', fontWeight: '700', color: '#5EEAD4' }}>
                         ≈ {currentCurrency.unit} {(Number(mealCost) * currentCurrency.rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                       </span>
