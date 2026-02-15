@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Plane, Home as HomeIcon, Trees, Building2, UtensilsCrossed, Camera, Palette, ShoppingBag, Coffee, RotateCcw, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-datepicker/dist/react-datepicker.css";
+import RouteDetail from './travel/RouteDetail';
+import RouteMaster from './travel/RouteMaster';
 
 declare global {
   interface Window {
