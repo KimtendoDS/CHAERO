@@ -339,14 +339,31 @@ const RouteDetail = ({ setStep }: { setStep: (s: number) => void }) => {
           {schedule.map((day, dayIndex) => {
             const isExpanded = expandedDay === dayIndex;
             return (
-              <Reorder.Item key={day.id} value={day} style={{ listStyle: 'none', width: '100%', marginBottom: '24px' }}>
+              <Reorder.Item 
+                key={day.id} 
+                value={day} 
+                dragListener={false} // ✅ Day 전체 드래그 비활성화
+                style={{ listStyle: 'none', width: '100%', marginBottom: '24px' }}
+              >
                 <div style={{ background: isExpanded ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px', overflow: 'hidden' }}>
-                  <div onClick={() => setExpandedDay(isExpanded ? -1 : dayIndex)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', cursor: 'pointer' }}>
-                    <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px' }}>
+                    <div 
+                      onClick={() => setExpandedDay(isExpanded ? -1 : dayIndex)} 
+                      style={{ flex: 1, cursor: 'pointer' }}
+                    >
                       <div style={{ fontSize: '18px', fontWeight: '900', color: '#fff', marginBottom: '4px' }}>{dayIndex + 1}일차</div>
                       <div style={{ fontSize: '11px', color: pearlColor, fontWeight: '700' }}>{getCalculatedDate(dayIndex)} · {day.items.length}개 일정</div>
                     </div>
-                    <GripVertical size={20} color="rgba(255,255,255,0.35)" />
+                    <div 
+                      data-reorder-handle // ✅ Day 햄버거만 드래그 가능
+                      style={{ 
+                        cursor: 'grab',
+                        padding: '10px',
+                        margin: '-10px'
+                      }}
+                    >
+                      <GripVertical size={20} color="rgba(255,255,255,0.35)" />
+                    </div>
                   </div>
 
                   <AnimatePresence>
@@ -358,10 +375,17 @@ const RouteDetail = ({ setStep }: { setStep: (s: number) => void }) => {
                             const swipeX = swipeStates[item.id] || 0;
                             
                             return (
-                              <Reorder.Item key={item.id} value={item} style={{ listStyle: 'none', position: 'relative', overflow: 'hidden' }}>
+                              <Reorder.Item 
+                                key={item.id} 
+                                value={item} 
+                                dragListener={false} // ✅ 전체 드래그 비활성화
+                                style={{ listStyle: 'none', position: 'relative', overflow: 'hidden' }}
+                              >
                                 {/* 빨간 삭제 배경 */}
                                 <div 
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log('🗑️ Delete clicked!', dayIndex, item.id);
                                     deleteScheduleItem(dayIndex, item.id);
                                     setSwipeStates(prev => ({ ...prev, [item.id]: 0 }));
                                   }}
@@ -421,7 +445,17 @@ const RouteDetail = ({ setStep }: { setStep: (s: number) => void }) => {
                                       <div style={{ display: 'inline-block', padding: '4px 8px', borderRadius: '6px', background: style.grad, fontSize: '9px', fontWeight: '900', color: '#000' }}>{style.label}</div>
                                     </div>
                                   </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div 
+                                    data-reorder-handle // ✅ 햄버거만 드래그 가능
+                                    style={{ 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      gap: '8px',
+                                      cursor: 'grab',
+                                      padding: '10px',
+                                      margin: '-10px' // 터치 영역 확장
+                                    }}
+                                  >
                                     <GripVertical size={20} color="rgba(255,255,255,0.18)" />
                                   </div>
                                 </div>
